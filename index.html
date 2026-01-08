@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夠不夠捲？職場內捲指數大測驗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-hover {
+            transition: all 0.2s;
+        }
+
+        .btn-hover:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center py-6 px-4">
+
+    <!-- Main Container -->
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden min-h-[500px] flex flex-col relative">
+
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-center text-white">
+            <h1 class="text-2xl font-bold">職場內捲指數檢測</h1>
+            <p class="text-indigo-200 text-sm mt-1">你是佛系員工還是頂級捲王？</p>
+        </div>
+
+        <!-- Content Area -->
+        <div id="app-content" class="flex-1 flex flex-col p-6">
+            <!-- Dynamic Content will be injected here -->
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-4 text-center text-gray-400 text-xs border-t">
+            <p>© 2024 Workaholic Check | 僅供娛樂與自我反思</p>
+        </div>
+    </div>
+
+    <script>
+        // Data Structure
+        const questions = [
+            // Part 1: 工作時間與邊界
+            "你是否經常在非工作時間（如週末、深夜）回覆工作訊息？",
+            "你的手機是否 24 小時開機，且將工作群組設為「開啟通知」？",
+            "你是否超過一年沒有休過長假（超過 5 天的年假）？",
+            "即使在休假期間，你是否也會隨身攜帶電腦以防萬一？",
+            "早上醒來的第一件事和睡前的最後一件事，是否都是查看工作相關的 APP？",
+            "你是否經常為了工作而取消與朋友或家人的聚會？",
+            "你是否認為「準時下班」是一種缺乏上進心的表現？",
+            "你的平均下班時間是否比公司規定的時間晚兩小時以上？",
+            "你是否曾在廁所、通勤途中或吃飯時處理公務？",
+            "你是否不記得上一次「完全不碰工作」的一整天是什麼時候？",
+
+            // Part 2: 競爭心態與焦慮感
+            "看到同事在朋友圈發加班的照片，你是否會感到焦慮或愧疚？",
+            "你是否覺得如果不持續學習新技能，馬上就會被淘汰？",
+            "你是否暗自將身邊的同事視為競爭對手，而非合作夥伴？",
+            "當得知同事獲得表揚或升遷時，你的第一反應是焦慮而非單純的祝賀？",
+            "你是否認為「休息」就是「浪費生命」？",
+            "你是否經常擔心自己的產出不如別人多？",
+            "即使完成了目標，你是否仍覺得自己做得不夠好、不夠完美？",
+            "你是否會主動承擔不屬於自己職責範圍內的工作，只為了表現積極？",
+            "你是否對於「閒下來」這件事感到恐慌？",
+            "你是否認為自己的價值完全取決於工作的績效？",
+
+            // Part 3: 身心健康反應
+            "你是否經常感到肩頸僵硬、背痛或偏頭痛，且主要發生在工作日？",
+            "你是否有失眠、多夢或早醒的問題，且夢境內容多與工作有關？",
+            "想到週一要上班，週日晚上你是否會感到明顯的胃痛或情緒低落？",
+            "你是否依靠咖啡、能量飲料或藥物來維持整天的工作精力？",
+            "你的體重是否因為工作壓力而出現劇烈波動（暴瘦或過勞肥）？",
+            "你是否經常因為工作壓力而對親近的人發脾氣？",
+            "你是否感覺記憶力衰退，經常忘記非工作相關的生活瑣事？",
+            "你是否在安靜的環境下會出現耳鳴或幻聽（以為手機在震動）？",
+            "你是否有過勞累到想哭，但擦乾眼淚繼續工作的經歷？",
+            "醫生是否曾警告你需要減少工作量，但你選擇忽略？",
+
+            // Part 4: 社交與生活品質
+            "在與朋友聚會時，你的話題是否三句不離工作？",
+            "你是否發現自己除了同事之外，幾乎沒有其他常聯繫的朋友？",
+            "你的興趣愛好是否已經因為「沒時間」而全部荒廢了？",
+            "你是否曾在約會或家庭聚餐時，因為處理工作而讓對方乾等？",
+            "家人是否經常抱怨你「把家當旅館」？",
+            "你是否已經很久沒有靜下心來看完一部電影或讀完一本閒書？",
+            "你是否會為了節省時間，而長期吃外送或快餐？",
+            "你是否覺得與非同行的人聊天很「浪費時間」或「沒有共同語言」？",
+            "你是否不記得父母或伴侶最近一次跟你分享的生活小事？",
+            "你的年度目標清單裡，是否 80% 以上都與工作或考證照有關？",
+
+            // Part 5: 極致「內捲」思維
+            "你是否會主動在深夜發送工作郵件，為了讓老闆知道你還在工作？",
+            "即使公司沒有要求，你是否也會主動製作精美的 PPT 或報告來「輾壓」同事？",
+            "你是否認為那些準時下班、享受生活的人是「不思進取」的？",
+            "你是否會利用午休時間開會或工作，並以此為榮？",
+            "你是否曾為了工作表現而隱瞞生病的事實？",
+            "當老闆指派不可能完成的任務時，你的第一反應是「我可以」而不是評估可行性？",
+            "你是否在潛意識裡希望老闆隨時都能聯繫到你？",
+            "你是否認為「996」（早9晚9週六上班）是年輕人奮鬥的福報或必經之路？",
+            "你是否會去研究同事的行事曆，以確保自己比他們更忙碌？",
+            "如果現在給你一千萬讓你辭職養老，你是否會因為失去工作帶來的「充實感」而感到空虛？"
+        ];
+
+        const resultsData = [
+            {
+                min: 0,
+                max: 12,
+                title: "佛系養生大師 🧘‍♂️",
+                subtitle: "薪水小偷（誤）",
+                color: "text-green-600",
+                bg: "bg-green-50",
+                desc: "你的工作與生活邊界如同銅牆鐵壁，不可侵犯。你深知「工作只是為了謀生，生活才是目的」。你不會為了 KPI 犧牲睡眠，也絕不當那個週末秒回訊息的人。",
+                analysis: "你擁有極佳的心理素質，對於同事的內捲行為免疫力極強。雖然可能被極度上進的老闆視為「不夠積極」，但你是全公司身心最健康、最不可能過勞死的人。",
+                advice: "繼續保持你的節奏，但要注意別真的「躺太平」而被邊緣化，適度的產出還是必要的生存手段。"
+            },
+            {
+                min: 13,
+                max: 25,
+                title: "人間清醒打工人 ⚖️",
+                subtitle: "職場性價比之王",
+                color: "text-blue-600",
+                bg: "bg-blue-50",
+                desc: "你是職場中的大多數，既有責任感，也懂得愛惜羽毛。你會在工作時間內全力以赴，但也懂得在下班後切換模式。偶爾的加班你可以接受，但長期的無償奉獻你會果斷拒絕。",
+                analysis: "你的腦袋很清楚，知道公司不是你的家。你有上進心，但那是為了更好的跳槽或加薪，而不是為了單純的自我感動。你處於一個相對平衡的狀態。",
+                advice: "這是最理想的狀態，請繼續保持這種「可持續發展」的工作模式。"
+            },
+            {
+                min: 26,
+                max: 38,
+                title: "焦慮奮鬥戰士 ⚔️",
+                subtitle: "內捲預備軍",
+                color: "text-orange-500",
+                bg: "bg-orange-50",
+                desc: "警報響起！你已經不知不覺陷入了內捲的漩渦。你常常感到焦慮，覺得如果不努力就會被拋下。加班對你來說已是家常便飯，身體也開始出現小毛病（如肩頸痛、失眠）。",
+                analysis: "你的自我價值感與工作績效高度綁定。你很在意別人的眼光，害怕落後，因此常常逼迫自己去做超出負荷的事。你雖然還沒完全崩潰，但那條緊繃的弦隨時可能斷掉。",
+                advice: "試著強制自己每週有一天「斷網日」。你需要意識到，世界少了你的努力運轉並不會停止，但你的健康沒了就是沒了。"
+            },
+            {
+                min: 39,
+                max: 50,
+                title: "燃燒生命的終極捲王 🔥",
+                subtitle: "辦公室地縛靈",
+                color: "text-red-600",
+                bg: "bg-red-50",
+                desc: "你的血液裡流的不是血，是濃縮咖啡。你與工作的關係已經到了「病態共生」的程度。你沒有生活，只有生存與競爭。你的存在本身就是對周遭同事的一種壓力。",
+                analysis: "你可能已經對「忙碌」上癮，一旦停下來就會感到巨大的空虛或恐慌。這種極致的內捲往往源於深層的不安全感。請注意，這不是榮耀，這是求救訊號。",
+                advice: "這不是開玩笑，<b>請立刻休假</b>，甚至考慮尋求心理諮詢協助。你需要重新找回生而為「人」的樂趣，而不僅僅是一台高效運轉的機器。"
+            }
+        ];
+
+        // State
+        let currentScore = 0;
+        let currentQuestionIndex = 0;
+
+        // Elements
+        const appContent = document.getElementById('app-content');
+
+        // Functions
+        function init() {
+            renderStartScreen();
+        }
+
+        function renderStartScreen() {
+            appContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full fade-in space-y-6">
+                    <div class="text-6xl mb-4">📋</div>
+                    <h2 class="text-xl font-bold text-gray-800 text-center">準備好面對真相了嗎？</h2>
+                    <p class="text-gray-600 text-center px-4 leading-relaxed">
+                        本測驗包含 50 道題目，請依照直覺回答「是」或「否」。<br>
+                        看看你是職場上的「佛系大師」還是「終極捲王」。
+                    </p>
+                    <button onclick="startQuiz()" class="btn-hover mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-12 rounded-full shadow-lg text-lg">
+                        開始測驗
+                    </button>
+                </div>
+            `;
+        }
+
+        function startQuiz() {
+            currentScore = 0;
+            currentQuestionIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+
+            appContent.innerHTML = `
+                <div class="flex flex-col h-full fade-in">
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                        <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                    </div>
+                    
+                    <div class="flex justify-between text-xs text-gray-400 mb-6 font-mono">
+                        <span>QUESTION</span>
+                        <span>${currentQuestionIndex + 1} / ${questions.length}</span>
+                    </div>
+
+                    <!-- Question Card -->
+                    <div class="flex-1 flex items-center justify-center mb-8">
+                        <h3 class="text-xl md:text-2xl font-medium text-gray-800 text-center leading-relaxed">
+                            ${questions[currentQuestionIndex]}
+                        </h3>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="grid grid-cols-2 gap-4 mt-auto">
+                        <button onclick="handleAnswer(false)" class="btn-hover border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-600 font-bold py-4 rounded-xl text-lg">
+                            否 ❌
+                        </button>
+                        <button onclick="handleAnswer(true)" class="btn-hover bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl text-lg shadow-md">
+                            是 ⭕
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAnswer(isYes) {
+            if (isYes) {
+                currentScore++;
+            }
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            // Find result logic
+            const result = resultsData.find(r => currentScore >= r.min && currentScore <= r.max);
+
+            appContent.innerHTML = `
+                <div class="flex flex-col h-full fade-in overflow-y-auto">
+                    <div class="text-center mb-6">
+                        <span class="inline-block px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold tracking-wider mb-2">測驗結果</span>
+                        <div class="text-5xl font-bold text-indigo-600 mb-2">${currentScore} <span class="text-lg text-gray-400 font-normal">/ 50分</span></div>
+                    </div>
+
+                    <div class="${result.bg} p-6 rounded-xl border border-gray-100 mb-6 text-center shadow-sm">
+                        <h2 class="text-2xl font-bold ${result.color} mb-1">${result.title}</h2>
+                        <p class="text-sm font-medium text-gray-500 mb-4">${result.subtitle}</p>
+                        <hr class="border-gray-200 my-3">
+                        <p class="text-gray-700 text-sm leading-relaxed text-left mb-4">
+                            <strong>狀態：</strong>${result.desc}
+                        </p>
+                        <p class="text-gray-700 text-sm leading-relaxed text-left">
+                            <strong>分析：</strong>${result.analysis}
+                        </p>
+                    </div>
+
+                    <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500 mb-6">
+                        <h4 class="font-bold text-indigo-700 text-sm mb-1">💡 給你的建議</h4>
+                        <p class="text-indigo-900 text-sm leading-relaxed">${result.advice}</p>
+                    </div>
+
+                    <button onclick="init()" class="btn-hover mt-auto w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-lg shadow-lg">
+                        重新測驗
+                    </button>
+                </div>
+            `;
+        }
+
+        // Run
+        init();
+
+    </script>
+</body>
+
+</html>
